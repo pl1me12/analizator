@@ -1,43 +1,114 @@
-import nltk
-from nltk.tokenize import sent_tokenize, word_tokenize
-from nltk.corpus import stopwords
-from nltk import pos_tag, ne_chunk
-nltk.download('punkt')
+import sys, random
+from PyQt5.QtWidgets import QMainWindow, QFrame, QDesktopWidget, QApplication
+from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal
+from PyQt5.QtGui import QPainter, QColor
 
-filename = input("Введите имя файла: ")
-word = input("Введите слово: ")
-sentences = []  # список для хранения предложений с искомым словом
+class Tetris(QMainWindow):
 
-# открываем файл и считываем все содержимое
-with open(filename, "r", encoding='utf-8') as f:
-    text = f.read()
+    def __init__(self):
+        super().__init__()
 
-# токенизируем текст на предложения и слова
-tokenized_text = sent_tokenize(text)
-words = word_tokenize(text)
+        self.initUI()
 
-# определяем стоп-слова
-stop_words = set(stopwords.words("english"))
 
-# проходимся по каждому предложению
-for sentence in tokenized_text:
-    # токенизируем предложение на слова
-    sentence_words = word_tokenize(sentence)
-    # проверяем, есть ли искомое слово в предложении
-    if word in sentence_words:
-        # убираем стоп-слова из предложения
-        filtered_words = [word for word in sentence_words if word.casefold() not in stop_words]
-        # определяем части речи слов в предложении
-        tagged_words = pos_tag(filtered_words)
-        # определяем синтаксический разбор предложения
-        parsed_sentence = ne_chunk(tagged_words)
-        # добавляем предложение в список, если оно содержит искомое слово
-        sentences.append((sentence, parsed_sentence))
+    def initUI(self):
 
-# выводим результаты
-if len(sentences) > 0:
-    for sentence, parsed_sentence in sentences:
-        print("Найдено в предложении: ", sentence)
-        print("Части речи слов: ", parsed_sentence)
-else:
-    print("Искомое слово не найдено в тексте.")
+        self.tboard = Board(self)
+        self.setCentralWidget(self.tboard)
+
+        self.statusbar = self.statusBar()
+        self.tboard.msg2Statusbar[str].connect(self.statusbar.showMessage)
+
+        self.tboard.start()
+
+        self.resize(180, 380)
+        self.center()
+        self.setWindowTitle('Tetris')
+        self.show()
+
+
+    def center(self):
+
+        screen = QDesktopWidget().screenGeometry()
+        size = self.geometry()
+        self.move((screen.width()-size.width())/2,
+            (screen.height()-size.height())/2)
+
+class Board(QFrame):
+
+    msg2Statusbar = pyqtSignal(str)
+
+    BoardWidth = 10
+    BoardHeight = 22
+    Speed = 300
+
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        self.initBoard()
+
+
+    def initBoard(self):
+
+        self.timer = QBasicTimer()
+        self.isWaitingAfterLine = False
+
+        self.curX = 0
+        self.curY = 0
+        self.numLinesRemoved = 0
+        self.board = []
+
+        self.setFocusPolicy(Qt.StrongFocus)
+        self.isStarted = False
+        self.isPaused = False
+        self.clearBoard()
+
+
+    def shapeAt(self, x, y):
+        return self.board[(y * Board.BoardWidth) + x]
+
+
+    def setShapeAt(self, x, y, shape):
+        self.board[(y * Board.BoardWidth) + x] = shape
+
+
+    def squareWidth(self):
+        return self.contentsRect().width() // Board.BoardWidth
+
+
+    def squareHeight(self):
+        return self.contentsRect().height() // Board.BoardHeight
+
+
+    def start(self):
+
+        if self.isPaused:
+            return
+
+        self.isStarted = True
+        self.isWaitingAfterLine = False
+        self.numLinesRemoved = 0
+        self.clearBoard()
+
+        self.msg2Statusbar.emit(str(self.numLinesRemoved))
+
+        self.newPiece()
+        self.timer.start(Board.Speed, self)
+
+
+    def pause(self):
+
+        if not self.isStarted:
+            return
+
+        self.isPaused = not self.isPaused
+
+        if self.isPaused:
+            self.timer.stop()
+            self.msg2Statusbar.emit("paused")
+
+        else:
+            self.timer.start(Board.Speed, self)
+            self.msg2Statusbar.emit(str(self.numLinesRemoved))
+
+        self.update()
