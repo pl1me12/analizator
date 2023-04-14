@@ -112,3 +112,28 @@ class Board(QFrame):
             self.msg2Statusbar.emit(str(self.numLinesRemoved))
 
         self.update()
+
+        def paintEvent(self, event):
+
+            painter = QPainter(self)
+            rect = self.contentsRect()
+
+            boardTop = rect.bottom() - Board.BoardHeight * self.squareHeight()
+
+            for i in range(Board.BoardHeight):
+                for j in range(Board.BoardWidth):
+                    shape = self.shapeAt(j, Board.BoardHeight - i - 1)
+
+                    if shape != Tetrominoe.NoShape:
+                        self.drawSquare(painter,
+                                        rect.left() + j * self.squareWidth(),
+                                        boardTop + i * self.squareHeight(), shape)
+
+            if self.curPiece.shape() != Tetrominoe.NoShape:
+
+                for i in range(4):
+                    x = self.curX + self.curPiece.x(i)
+                    y = self.curY - self.curPiece.y(i)
+                    self.drawSquare(painter, rect.left() + x * self.squareWidth(),
+                                    boardTop + (Board.BoardHeight - y - 1) * self.squareHeight(),
+                                    self.curPiece.shape())
