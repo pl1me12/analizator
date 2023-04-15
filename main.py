@@ -173,3 +173,21 @@ class Board(QFrame):
 
         else:
             super(Board, self).keyPressEvent(event)
+
+    def timerEvent(self, event):
+
+        if event.timerId() == self.timer.timerId():
+
+            if self.isWaitingAfterLine:
+                self.isWaitingAfterLine = False
+                self.newPiece()
+            else:
+                self.oneLineDown()
+
+        else:
+            super(Board, self).timerEvent(event)
+
+    def clearBoard(self):
+
+        for i in range(Board.BoardHeight * Board.BoardWidth):
+            self.board.append(Tetrominoe.NoShape)
