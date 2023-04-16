@@ -1,248 +1,260 @@
-import sys, random
-from PyQt5.QtWidgets import QMainWindow, QFrame, QDesktopWidget, QApplication
-from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal
-from PyQt5.QtGui import QPainter, QColor
+# Import libraries
+import pygame
+import sys
+import random
+import time
 
-class Tetris(QMainWindow):
+# Define important global variables
+pygame.init()
+clock = pygame.time.Clock()
 
+best_score = 0
+longest_time = 0
+
+width = 700
+height = 750
+DISPLAY_SCREEN = pygame.display.set_mode((width, height))
+pygame.display.set_caption(" Tetris")
+
+off_set_x = 10
+off_set_y = 80
+playing_field_width = 330  # 330 / 10 = 33 width per tile
+playing_field_height = 660  # 600 / 20 = 33 height per tile
+tile_length = 33  # tile is a square
+
+# colors
+blue = (0, 0, 255)
+white = (255, 255, 255)
+black = (0, 0, 0)
+gray = (95, 95, 96)
+orange = (249, 87, 0)
+cobalt_blue = (3, 65, 174)
+green_apple = (114, 203, 59)
+cyber_yellow = (255, 213, 0)
+beer = (255, 151, 28)
+ryb_red = (255, 50, 19)
+purple = (128, 0, 128)
+
+# colors of Tetris blocks
+block_colors = (cobalt_blue, blue, green_apple, purple, cyber_yellow, beer, ryb_red)
+# shapes of Tetris blocks
+shapes = ("i_block", "l_block", "j_block", "o_block", "s_block", "t_block", "z_block")
+directions = ("vertical_1", "vertical_2", "horizontal_1", "horizontal_2")
+
+background_img = pygame.image.load("resources/images/background_img.jpg")
+instructions_img = pygame.image.load("resources/images/instructions_img.jpg")
+icon_img = pygame.image.load("resources/images/icon.png")
+pygame.display.set_icon(icon_img)
+
+
+class Button:
+    def __init__(self, button_color, button_hover_over_color, x, y, width, height, text_size, text_color,
+                 text_hover_over_color=None, text_str=""):
+        self.button_color = button_color
+        self.button_hover_over_color = button_hover_over_color
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.text_size = text_size
+        self.text_color = text_color
+
+        if text_hover_over_color:
+            self.text_hover_over_color = text_hover_over_color
+        else:
+            self.text_hover_over_color = text_color
+
+        self.text_str = text_str
+
+    def blit(self, display_screen, outline_color=None):
+        if outline_color:
+            pygame.draw.rect(display_screen, outline_color, (self.x - 3, self.y - 3, self.width + 6, self.height + 6))
+
+        pygame.draw.rect(display_screen, self.button_color, (self.x, self.y, self.width, self.height))
+
+        if self.text_str != "":
+            font = pygame.font.Font("freesansbold.ttf", self.text_size)
+            text = font.render(self.text_str, True, self.text_color)
+            # to center the text in the middle of the button based on the size of the button
+            text_position = (
+            self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 - text.get_height() / 2))
+            display_screen.blit(text, text_position)
+
+    def is_hovered_over(self, mouse_position):
+        if self.x < mouse_position[0] < self.x + self.width and self.y < mouse_position[1] < self.y + self.height:
+            return True
+        return False
+
+    def blit_hovered_over(self, display_screen):
+        pygame.draw.rect(display_screen, self.button_hover_over_color, (self.x, self.y, self.width, self.height))
+
+        if self.text_str != "":
+            font = pygame.font.Font("freesansbold.ttf", self.text_size)
+            text = font.render(self.text_str, True, self.text_hover_over_color)
+            # to center the text in the middle of the button based on the size of the button
+            text_position = (
+            self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 - text.get_height() / 2))
+            display_screen.blit(text, text_position)
+
+    def is_clicked(self, mouse_position, event):
+        if self.is_hovered_over(mouse_position):
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                return True
+        return False
+
+
+class Tile:
+    def __init__(self, x, y, color=black):
+        self.x = x
+        self.y = y
+        self.color = color
+        self.empty = True
+
+    def draw_tile(self):
+        pygame.draw.rect(DISPLAY_SCREEN, self.color, (self.x, self.y, tile_length, tile_length))
+
+
+class PlayingField():
     def __init__(self):
-        super().__init__()
+        # y coordinate of first row = (80) off_set_y
+        self.tiles = {
+            "row1": {80: []},
+            "row2": {113: []},
+            "row3": {146: []},
+            "row4": {179: []},
+            "row5": {212: []},
+            "row6": {245: []},
+            "row7": {278: []},
+            "row8": {311: []},
+            "row9": {344: []},
+            "row10": {377: []},
+            "row11": {410: []},
+            "row12": {443: []},
+            "row13": {476: []},
+            "row14": {509: []},
+            "row15": {542: []},
+            "row16": {575: []},
+            "row17": {608: []},
+            "row18": {641: []},
+            "row19": {674: []},
+            "row20": {707: []},
+        }
+        self.__init_field()
 
-        self.initUI()
+    def __init_field(self):
+        y = off_set_y
+        for i in range(20):  # rows
+            x = off_set_x
+            for j in range(10):  # cols
+                tile_to_add = Tile(x, y)
+                self.tiles["row" + str(i + 1)][y].append(tile_to_add)
+                x += tile_length
+            y += tile_length
 
+    def destory_full_row(self, player):
+        times = 0
+        y = off_set_y
+        for i in range(20):
+            for tile in self.tiles["row" + str(i + 1)][y]:
+                if tile.empty:
+                    break
 
-    def initUI(self):
+                elif tile.x == off_set_x + playing_field_width - tile_length:
+                    times += 1
+                    for j in range(800):  # just for flashing the row
+                        if j % 2 == 0:
+                            pygame.draw.rect(DISPLAY_SCREEN, black, (
+                            self.tiles["row" + str(i + 1)][y][0].x + 1, self.tiles["row" + str(i + 1)][y][0].y + 1,
+                            playing_field_width - 2, tile_length - 2))
+                        else:
+                            for tile in self.tiles["row" + str(i + 1)][y]:
+                                pygame.draw.rect(DISPLAY_SCREEN, tile.color, (tile.x, tile.y, tile_length, tile_length))
+                        pygame.draw.line(DISPLAY_SCREEN, white, (off_set_x, y),
+                                         (playing_field_width + off_set_x - 1, y))  # horizontal line
+                        pygame.display.update()
 
-        self.tboard = Board(self)
-        self.setCentralWidget(self.tboard)
+                    # let's destory this full row
+                    self.destroy_and_replace(i + 1, y)
+                    player.score += 10 * times
 
-        self.statusbar = self.statusBar()
-        self.tboard.msg2Statusbar[str].connect(self.statusbar.showMessage)
+            y += tile_length
 
-        self.tboard.start()
+    def destroy_and_replace(self, row_number, row_y):
+        for i in range(row_number, 1, -1):
+            prev_row_number = i - 1
+            prev_y = row_y - tile_length
 
-        self.resize(180, 380)
-        self.center()
-        self.setWindowTitle('Tetris')
-        self.show()
+            self.tiles["row" + str(i)][row_y].clear()  # current_row.clear()
+            temp_x = off_set_x
+            for j in range(10):
+                empty_tile = Tile(temp_x, row_y)
+                temp_x += tile_length
+                self.tiles["row" + str(i)][row_y].append(empty_tile)
+            if prev_y < 80:
+                break
 
+            for j in range(10):
+                old_tile = self.tiles["row" + str(i)][row_y][j]
+                new_tile = self.tiles["row" + str(prev_row_number)][prev_y][j]
+                old_tile.x = new_tile.x
+                old_tile.color = new_tile.color
+                old_tile.empty = new_tile.empty
 
-    def center(self):
-
-        screen = QDesktopWidget().screenGeometry()
-        size = self.geometry()
-        self.move((screen.width()-size.width())/2,
-            (screen.height()-size.height())/2)
-
-class Board(QFrame):
-
-    msg2Statusbar = pyqtSignal(str)
-
-    BoardWidth = 10
-    BoardHeight = 22
-    Speed = 300
-
-    def __init__(self, parent):
-        super().__init__(parent)
-
-        self.initBoard()
-
-
-    def initBoard(self):
-
-        self.timer = QBasicTimer()
-        self.isWaitingAfterLine = False
-
-        self.curX = 0
-        self.curY = 0
-        self.numLinesRemoved = 0
-        self.board = []
-
-        self.setFocusPolicy(Qt.StrongFocus)
-        self.isStarted = False
-        self.isPaused = False
-        self.clearBoard()
-
-
-    def shapeAt(self, x, y):
-        return self.board[(y * Board.BoardWidth) + x]
-
-
-    def setShapeAt(self, x, y, shape):
-        self.board[(y * Board.BoardWidth) + x] = shape
-
-
-    def squareWidth(self):
-        return self.contentsRect().width() // Board.BoardWidth
-
-
-    def squareHeight(self):
-        return self.contentsRect().height() // Board.BoardHeight
-
-
-    def start(self):
-
-        if self.isPaused:
-            return
-
-        self.isStarted = True
-        self.isWaitingAfterLine = False
-        self.numLinesRemoved = 0
-        self.clearBoard()
-
-        self.msg2Statusbar.emit(str(self.numLinesRemoved))
-
-        self.newPiece()
-        self.timer.start(Board.Speed, self)
+            row_y -= tile_length
 
 
-    def pause(self):
+class Block:
+    def __init__(self, shape: str, color=black):
+        self.shape = shape
+        self.color = color
 
-        if not self.isStarted:
-            return
+        self.direction = directions[0]  # vertical_1
 
-        self.isPaused = not self.isPaused
+        #                         tile1                                                        , tile2            , tile3            , tile4
+        self.tiles = [Tile(off_set_x + playing_field_width / 2 - tile_length, off_set_y, self.color), Tile(0, 0, color),
+                      Tile(0, 0, color), Tile(0, 0, color)]
 
-        if self.isPaused:
-            self.timer.stop()
-            self.msg2Statusbar.emit("paused")
+        self.__init_shape()
+        for tile in self.tiles:
+            tile.empty = False
 
+    def __init_shape(self):
+        if self.shape == "i_block":
+            self.tiles[1] = Tile(self.tiles[0].x, self.tiles[0].y - tile_length, self.color)
+            self.tiles[2] = Tile(self.tiles[0].x, self.tiles[1].y - tile_length, self.color)
+            self.tiles[3] = Tile(self.tiles[0].x, self.tiles[2].y - tile_length, self.color)
+        elif self.shape == "l_block":
+            self.tiles[1] = Tile(self.tiles[0].x + tile_length, self.tiles[0].y, self.color)
+            self.tiles[2] = Tile(self.tiles[0].x - tile_length, self.tiles[0].y, self.color)
+            self.tiles[3] = Tile(self.tiles[2].x, self.tiles[2].y - tile_length, self.color)
+        elif self.shape == "j_block":
+            self.tiles[1] = Tile(self.tiles[0].x + tile_length, self.tiles[0].y, self.color)
+            self.tiles[2] = Tile(self.tiles[0].x - tile_length, self.tiles[0].y, self.color)
+            self.tiles[3] = Tile(self.tiles[1].x, self.tiles[1].y - tile_length, self.color)
+        elif self.shape == "o_block":
+            self.tiles[1] = Tile(self.tiles[0].x + tile_length, self.tiles[0].y, self.color)
+            self.tiles[2] = Tile(self.tiles[0].x, self.tiles[0].y - tile_length, self.color)
+            self.tiles[3] = Tile(self.tiles[1].x, self.tiles[1].y - tile_length, self.color)
+        elif self.shape == "s_block":
+            self.tiles[1] = Tile(self.tiles[0].x - tile_length, self.tiles[0].y, self.color)
+            self.tiles[2] = Tile(self.tiles[0].x, self.tiles[0].y - tile_length, self.color)
+            self.tiles[3] = Tile(self.tiles[2].x + tile_length, self.tiles[2].y, self.color)
+        elif self.shape == "t_block":
+            self.tiles[1] = Tile(self.tiles[0].x + tile_length, self.tiles[0].y, self.color)
+            self.tiles[2] = Tile(self.tiles[0].x - tile_length, self.tiles[0].y, self.color)
+            self.tiles[3] = Tile(self.tiles[0].x, self.tiles[0].y - tile_length, self.color)
+        elif self.shape == "z_block":
+            self.tiles[1] = Tile(self.tiles[0].x + tile_length, self.tiles[0].y, self.color)
+            self.tiles[2] = Tile(self.tiles[0].x, self.tiles[0].y - tile_length, self.color)
+            self.tiles[3] = Tile(self.tiles[2].x - tile_length, self.tiles[2].y, self.color)
         else:
-            self.timer.start(Board.Speed, self)
-            self.msg2Statusbar.emit(str(self.numLinesRemoved))
+            print("Error: wrong block name.")
+            pygame.quit()
+            sys.exit()
 
-        self.update()
+    def complete_block(self):
+        self.__init_shape()
 
-        def paintEvent(self, event):
-
-            painter = QPainter(self)
-            rect = self.contentsRect()
-
-            boardTop = rect.bottom() - Board.BoardHeight * self.squareHeight()
-
-            for i in range(Board.BoardHeight):
-                for j in range(Board.BoardWidth):
-                    shape = self.shapeAt(j, Board.BoardHeight - i - 1)
-
-                    if shape != Tetrominoe.NoShape:
-                        self.drawSquare(painter,
-                                        rect.left() + j * self.squareWidth(),
-                                        boardTop + i * self.squareHeight(), shape)
-
-            if self.curPiece.shape() != Tetrominoe.NoShape:
-
-                for i in range(4):
-                    x = self.curX + self.curPiece.x(i)
-                    y = self.curY - self.curPiece.y(i)
-                    self.drawSquare(painter, rect.left() + x * self.squareWidth(),
-                                    boardTop + (Board.BoardHeight - y - 1) * self.squareHeight(),
-                                    self.curPiece.shape())
-
-    def keyPressEvent(self, event):
-
-        if not self.isStarted or self.curPiece.shape() == Tetrominoe.NoShape:
-            super(Board, self).keyPressEvent(event)
-            return
-
-        key = event.key()
-
-        if key == Qt.Key_P:
-            self.pause()
-            return
-
-        if self.isPaused:
-            return
-
-        elif key == Qt.Key_Left:
-            self.tryMove(self.curPiece, self.curX - 1, self.curY)
-
-        elif key == Qt.Key_Right:
-            self.tryMove(self.curPiece, self.curX + 1, self.curY)
-
-        elif key == Qt.Key_Down:
-            self.tryMove(self.curPiece.rotateRight(), self.curX, self.curY)
-
-        elif key == Qt.Key_Up:
-            self.tryMove(self.curPiece.rotateLeft(), self.curX, self.curY)
-
-        elif key == Qt.Key_Space:
-            self.dropDown()
-
-        elif key == Qt.Key_D:
-            self.oneLineDown()
-
-        else:
-            super(Board, self).keyPressEvent(event)
-
-    def timerEvent(self, event):
-
-        if event.timerId() == self.timer.timerId():
-
-            if self.isWaitingAfterLine:
-                self.isWaitingAfterLine = False
-                self.newPiece()
-            else:
-                self.oneLineDown()
-
-        else:
-            super(Board, self).timerEvent(event)
-
-    def clearBoard(self):
-
-        for i in range(Board.BoardHeight * Board.BoardWidth):
-            self.board.append(Tetrominoe.NoShape)
-
-            def dropDown(self):
-
-                newY = self.curY
-
-                while newY > 0:
-
-                    if not self.tryMove(self.curPiece, self.curX, newY - 1):
-                        break
-
-                    newY -= 1
-
-                self.pieceDropped()
-
-            def oneLineDown(self):
-
-                if not self.tryMove(self.curPiece, self.curX, self.curY - 1):
-                    self.pieceDropped()
-
-            def pieceDropped(self):
-
-                for i in range(4):
-                    x = self.curX + self.curPiece.x(i)
-                    y = self.curY - self.curPiece.y(i)
-                    self.setShapeAt(x, y, self.curPiece.shape())
-
-                self.removeFullLines()
-
-                if not self.isWaitingAfterLine:
-                    self.newPiece()
-
-        def removeFullLines(self):
-
-            numFullLines = 0
-            rowsToRemove = []
-
-            for i in range(Board.BoardHeight):
-
-                n = 0
-                for j in range(Board.BoardWidth):
-                    if not self.shapeAt(j, i) == Tetrominoe.NoShape:
-                        n = n + 1
-
-                if n == 10:
-                    rowsToRemove.append(i)
-
-            rowsToRemove.reverse()
-
-            for m in rowsToRemove:
-
-                for k in range(m, Board.BoardHeight):
-                    for l in range(Board.BoardWidth):
-                        self.setShapeAt(l, k, self.shapeAt(l, k + 1))
-
-            numFullLines = numFullLines + len(rowsToRemove)
+    def can_fall(self, next_block, playing_field, player):
+        from tetris import manage_events, update_graphics
+        manage_events(self, next_block, playing_field,player)
