@@ -191,3 +191,58 @@ class Board(QFrame):
 
         for i in range(Board.BoardHeight * Board.BoardWidth):
             self.board.append(Tetrominoe.NoShape)
+
+            def dropDown(self):
+
+                newY = self.curY
+
+                while newY > 0:
+
+                    if not self.tryMove(self.curPiece, self.curX, newY - 1):
+                        break
+
+                    newY -= 1
+
+                self.pieceDropped()
+
+            def oneLineDown(self):
+
+                if not self.tryMove(self.curPiece, self.curX, self.curY - 1):
+                    self.pieceDropped()
+
+            def pieceDropped(self):
+
+                for i in range(4):
+                    x = self.curX + self.curPiece.x(i)
+                    y = self.curY - self.curPiece.y(i)
+                    self.setShapeAt(x, y, self.curPiece.shape())
+
+                self.removeFullLines()
+
+                if not self.isWaitingAfterLine:
+                    self.newPiece()
+
+        def removeFullLines(self):
+
+            numFullLines = 0
+            rowsToRemove = []
+
+            for i in range(Board.BoardHeight):
+
+                n = 0
+                for j in range(Board.BoardWidth):
+                    if not self.shapeAt(j, i) == Tetrominoe.NoShape:
+                        n = n + 1
+
+                if n == 10:
+                    rowsToRemove.append(i)
+
+            rowsToRemove.reverse()
+
+            for m in rowsToRemove:
+
+                for k in range(m, Board.BoardHeight):
+                    for l in range(Board.BoardWidth):
+                        self.setShapeAt(l, k, self.shapeAt(l, k + 1))
+
+            numFullLines = numFullLines + len(rowsToRemove)
