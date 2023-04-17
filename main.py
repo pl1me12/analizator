@@ -258,3 +258,41 @@ class Block:
     def can_fall(self, next_block, playing_field, player):
         from tetris import manage_events, update_graphics
         manage_events(self, next_block, playing_field,player)
+        # check borders
+        for block_tile in self.tiles:
+            if block_tile.y >= playing_field_height + off_set_y - tile_length:
+                return False
+
+        # check already existed tiles
+        for block_tile in self.tiles:
+            y = off_set_y
+            for i in range(20):
+                for tile in playing_field.tiles["row" + str(i + 1)][y]:
+                    if not tile.empty and block_tile.y + tile_length == tile.y and block_tile.x == tile.x:
+                        return False
+                y += tile_length
+
+        return True
+
+    def block_is_falling(self, next_block, playing_field, player, faster=None):
+        from tetris import manage_events, update_graphics
+        manage_events(self, next_block, playing_field, player)
+
+        if self.can_fall(next_block, playing_field, player):
+            for tile in self.tiles:
+                tile.y += tile_length
+
+            manage_events(self, next_block, playing_field, player)
+            update_graphics(self, next_block, playing_field, player)
+            if faster:
+                clock.tick(40)
+                self.block_is_falling(next_block, playing_field, player)
+            else:
+                clock.tick(5)
+            manage_events(self, next_block, playing_field, player)
+            update_graphics(self, next_block, playing_field, player)
+
+    def get_new_block(self, next_block, playing_field, player):
+        if self.can_fall(next_block, playing_field, player): return (self, next_block, False)
+
+
