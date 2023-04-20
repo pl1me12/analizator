@@ -295,4 +295,55 @@ class Block:
     def get_new_block(self, next_block, playing_field, player):
         if self.can_fall(next_block, playing_field, player): return (self, next_block, False)
 
+        # if the block has falled completely
+        for block_tile in self.tiles:
+            found = False
+            y = off_set_y
+            for i in range(20):
+                if not found:
+                    for j in range(10):
+                        if block_tile.x == playing_field.tiles["row" + str(i + 1)][y][j].x and block_tile.y == \
+                                playing_field.tiles["row" + str(i + 1)][y][j].y:
+                            playing_field.tiles["row" + str(i + 1)][y][j].color = block_tile.color
+                            playing_field.tiles["row" + str(i + 1)][y][j].empty = False
+                            found = True
+                            break
+                    y += tile_length
+                else:
+                    break
+
+        new_block = next_block
+
+        next_rand_index1 = random.randint(0, 6)
+        next_rand_index2 = random.randint(0, 6)
+        new_next_block = Block(shapes[next_rand_index1], block_colors[next_rand_index2])
+
+        clock.tick(2)
+        return (new_block, new_next_block, True)
+
+    def move_left(self, playing_field):
+        if self.can_move_left(playing_field):
+            for tile in self.tiles:
+                tile.x -= tile_length
+
+    def move_right(self, playing_field):
+        if self.can_move_right(playing_field):
+            for tile in self.tiles:
+                tile.x += tile_length
+
+    def can_move_left(self, playing_field):
+        # whether inside the playing field or not
+        for tile in self.tiles:
+            if tile.x <= off_set_x:
+                return False
+        # whether adjacent field_tiles are occupied or not
+        for block_tile in self.tiles:
+            y = off_set_y
+            for i in range(20):
+                for tile in playing_field.tiles["row" + str(i + 1)][y]:
+                    if not tile.empty and block_tile.x - tile_length == tile.x and block_tile.y == tile.y:
+                        return False
+                y += tile_length
+        return True
+
 
