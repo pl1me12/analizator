@@ -346,4 +346,47 @@ class Block:
                 y += tile_length
         return True
 
+    def can_move_right(self, playing_field):
+        # whether inside the playing field or not
+        for tile in self.tiles:
+            if tile.x + tile_length >= off_set_x + playing_field_width:
+                return False
+        # whether adjacent field_tiles are occupied or not
+        for block_tile in self.tiles:
+            y = off_set_y
+            for i in range(20):
+                for tile in playing_field.tiles["row" + str(i + 1)][y]:
+                    if not tile.empty and block_tile.x + tile_length == tile.x and block_tile.y == tile.y:
+                        return False
+                y += tile_length
+        return True
+
+    def rotate(self, next_block, playing_field, player):
+        from tetris import manage_events, update_graphics
+        manage_events(self, next_block, playing_field, player)
+
+        if self.shape == "i_block":
+            self.rotate_i_block(playing_field)
+        elif self.shape == "l_block":
+            self.rotate_l_block(playing_field)
+        elif self.shape == "j_block":
+            self.rotate_j_block(playing_field)
+        elif self.shape == "o_block":
+            return
+            # no rotation for o_block.
+        elif self.shape == "s_block":
+            self.rotate_s_block(playing_field)
+        elif self.shape == "t_block":
+            self.rotate_t_block(playing_field)
+        elif self.shape == "z_block":
+            self.rotate_z_block(playing_field)
+        else:
+            print("Error: wrong block name.")
+            pygame.quit()
+            sys.exit()
+        manage_events(self, next_block, playing_field, player)
+        update_graphics(self, next_block, playing_field, player)
+
+
+
 
