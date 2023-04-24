@@ -189,3 +189,135 @@ def manage_events(block, next_block, playing_field, player):
 
     update_graphics(block, next_block, playing_field, player)
 
+
+def introduction(player=None):
+    button_width = 300
+    button_height = 90
+
+    # start_x_button = width/2-button_width/2
+    play_button = Button(blue, orange, -400, height / 2, button_width, button_height, 32, black, white, "PLAY")
+    instructions_button = Button(blue, orange, width + 150, height / 2 + button_height + 10, button_width,
+                                 button_height, 32, black, white, "INSTRUCTIONS")
+    quit_button = Button(blue, orange, -400, height / 2 + button_height * 2 + 20, button_width, button_height, 32,
+                         black, white, "QUIT")
+
+    font = pygame.font.SysFont("comicsansms", 48)
+    rendered_text = font.render("Tetris", 1, black)
+    rendered_text_y = height
+
+    # To draw the Tetris text in an animated way
+    while rendered_text_y > 10:
+        DISPLAY_SCREEN.blit(background_img, (0, 0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        rendered_text_y -= 1.5
+        DISPLAY_SCREEN.blit(rendered_text, (width / 2 - 80, rendered_text_y))
+        pygame.display.update()
+
+    # To draw the score and time texts in an animated way
+    if player:
+        font_small = pygame.font.SysFont("comicsansms", 30)
+        rendered_current_score = font_small.render("Current Score: " + str(player.score), 1, orange)
+        rendered_best_score = font_small.render("Best Score: " + str(best_score), 1, orange)
+        rendered_current_time = font_small.render("Current Time: " + str(player.time_since_start), 1, orange)
+        rendered_longest_time = font_small.render("Longest Time: " + str(longest_time), 1, orange)
+
+        rendered_current_score_y = height
+        rendered_best_score_y = height + 40
+        rendered_current_time_y = height + 80
+        rendered_longest_time_y = height + 120
+
+        while rendered_current_score_y > 150:
+            DISPLAY_SCREEN.blit(background_img, (0, 0))
+            DISPLAY_SCREEN.blit(rendered_text, (width / 2 - 80, rendered_text_y))
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+            rendered_current_score_y -= 1.5
+            rendered_best_score_y -= 1.5
+            rendered_current_time_y -= 1.5
+            rendered_longest_time_y -= 1.5
+
+            DISPLAY_SCREEN.blit(rendered_current_score, (off_set_x, rendered_current_score_y))
+            DISPLAY_SCREEN.blit(rendered_best_score, (off_set_x + 45, rendered_best_score_y))
+            DISPLAY_SCREEN.blit(rendered_current_time, (off_set_x + 15, rendered_current_time_y))
+            DISPLAY_SCREEN.blit(rendered_longest_time, (off_set_x + 15, rendered_longest_time_y))
+
+            pygame.display.update()
+
+    # To draw the buttons in an animated way
+    while play_button.x < width / 2 - button_width / 2 or instructions_button.x > width / 2 - button_width / 2:
+        DISPLAY_SCREEN.blit(background_img, (0, 0))
+        DISPLAY_SCREEN.blit(rendered_text, (width / 2 - 80, rendered_text_y))
+        if player:
+            DISPLAY_SCREEN.blit(rendered_current_score, (off_set_x, rendered_current_score_y))
+            DISPLAY_SCREEN.blit(rendered_best_score, (off_set_x + 45, rendered_best_score_y))
+            DISPLAY_SCREEN.blit(rendered_current_time, (off_set_x + 15, rendered_current_time_y))
+            DISPLAY_SCREEN.blit(rendered_longest_time, (off_set_x + 15, rendered_longest_time_y))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        if play_button.x < width / 2 - button_width / 2:
+            play_button.x += 3
+            quit_button.x += 3
+        if instructions_button.x > width / 2 - button_width / 2:
+            instructions_button.x -= 3
+
+        play_button.blit(DISPLAY_SCREEN)
+        instructions_button.blit(DISPLAY_SCREEN)
+        quit_button.blit(DISPLAY_SCREEN)
+        pygame.display.update()
+
+    run = True
+    while run:
+        DISPLAY_SCREEN.blit(background_img, (0, 0))
+        DISPLAY_SCREEN.blit(rendered_text, (width / 2 - 80, rendered_text_y))
+        if player:
+            DISPLAY_SCREEN.blit(rendered_current_score, (off_set_x, rendered_current_score_y))
+            DISPLAY_SCREEN.blit(rendered_best_score, (off_set_x + 45, rendered_best_score_y))
+            DISPLAY_SCREEN.blit(rendered_current_time, (off_set_x + 15, rendered_current_time_y))
+            DISPLAY_SCREEN.blit(rendered_longest_time, (off_set_x + 15, rendered_longest_time_y))
+
+        # Get the position of the mouse
+        mouse_position = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if play_button.is_clicked(mouse_position, event):
+                    start_game()
+                    run = False
+                elif instructions_button.is_clicked(mouse_position, event):
+                    instructions(player)
+                    run = False
+                elif quit_button.is_clicked(mouse_position, event):
+                    pygame.quit()
+                    sys.exit()
+
+        if play_button.is_hovered_over(mouse_position):
+            play_button.blit_hovered_over(DISPLAY_SCREEN)
+        else:
+            play_button.blit(DISPLAY_SCREEN, gray)
+        if instructions_button.is_hovered_over(mouse_position):
+            instructions_button.blit_hovered_over(DISPLAY_SCREEN)
+        else:
+            instructions_button.blit(DISPLAY_SCREEN, gray)
+        if quit_button.is_hovered_over(mouse_position):
+            quit_button.blit_hovered_over(DISPLAY_SCREEN)
+        else:
+            quit_button.blit(DISPLAY_SCREEN, gray)
+
+        clock.tick(60)
+        pygame.display.update()
+
