@@ -41,9 +41,9 @@ block_colors = (cobalt_blue, blue, green_apple, purple, cyber_yellow, beer, ryb_
 shapes = ("i_block", "l_block", "j_block", "o_block", "s_block", "t_block", "z_block")
 directions = ("vertical_1", "vertical_2", "horizontal_1", "horizontal_2")
 
-background_img = pygame.image.load("resources/images/background_img.jpg")
-instructions_img = pygame.image.load("resources/images/instructions_img.jpg")
-icon_img = pygame.image.load("resources/images/icon.png")
+background_img = pygame.image.load("/analizator/images/background_img.jpg")
+instructions_img = pygame.image.load("/analizator/images/instructions_img.jpg")
+icon_img = pygame.image.load("/analizator/images/icon.png")
 pygame.display.set_icon(icon_img)
 
 
