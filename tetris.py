@@ -321,3 +321,72 @@ def introduction(player=None):
         clock.tick(60)
         pygame.display.update()
 
+
+def instructions(player=None):
+    button_width = 150
+    button_height = 60
+
+    play_button = Button(blue, orange, width - 150 - 10, height - 80, button_width, button_height, 32, black, white,
+                         "PLAY >>")
+    back_button = Button(blue, orange, 10, height - 80, button_width, button_height, 32, black, white, "<< BACK")
+
+    run = True
+    while run:
+        DISPLAY_SCREEN.blit(instructions_img, (0, 0))
+        font = pygame.font.SysFont("comicsansms", 48)
+        rendered_text = font.render("Tetris", 1, orange)
+        DISPLAY_SCREEN.blit(rendered_text, (width / 2 - 80, 10))
+
+        # Get the position of the mouse
+        mouse_position = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if play_button.is_clicked(mouse_position, event):
+                    start_game()
+                    run = False
+                elif back_button.is_clicked(mouse_position, event):
+                    introduction(player)
+                    run = False
+
+        instructions_label = "Instructions"
+        font = pygame.font.SysFont("comicsansms", 40)
+        rendered_text = font.render(instructions_label, 1, orange)
+        DISPLAY_SCREEN.blit(rendered_text, (width / 2 - rendered_text.get_width() / 2, 100))
+
+        instructions1 = "   Move Right:                      right arrow >"
+        instructions2 = "   Move   Left:                     left    arrow <"
+        instructions3 = "          Rotate:                      up      arrow ^"
+        instructions4 = "   Soft  Drop:                      down   arrow"
+        instructions5 = "   Hard  Drop:                      space"
+
+        font = pygame.font.SysFont("comicsansms", 20)
+        rendered_text1 = font.render(instructions1, 1, orange)
+        rendered_text2 = font.render(instructions2, 1, orange)
+        rendered_text3 = font.render(instructions3, 1, orange)
+        rendered_text4 = font.render(instructions4, 1, orange)
+        rendered_text5 = font.render(instructions5, 1, orange)
+
+        DISPLAY_SCREEN.blit(rendered_text1, (20, 200))
+        DISPLAY_SCREEN.blit(rendered_text2, (20, 240))
+        DISPLAY_SCREEN.blit(rendered_text3, (20, 280))
+        DISPLAY_SCREEN.blit(rendered_text4, (20, 320))
+        DISPLAY_SCREEN.blit(rendered_text5, (20, 360))
+
+        if play_button.is_hovered_over(mouse_position):
+            play_button.blit_hovered_over(DISPLAY_SCREEN)
+        else:
+            play_button.blit(DISPLAY_SCREEN, gray)
+        if back_button.is_hovered_over(mouse_position):
+            back_button.blit_hovered_over(DISPLAY_SCREEN)
+        else:
+            back_button.blit(DISPLAY_SCREEN, gray)
+
+        clock.tick(60)
+        pygame.display.update()
+
+
+if __name__ == "__main__":
+    introduction()
