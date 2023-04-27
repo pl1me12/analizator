@@ -41,9 +41,9 @@ block_colors = (cobalt_blue, blue, green_apple, purple, cyber_yellow, beer, ryb_
 shapes = ("i_block", "l_block", "j_block", "o_block", "s_block", "t_block", "z_block")
 directions = ("vertical_1", "vertical_2", "horizontal_1", "horizontal_2")
 
-background_img = pygame.image.load("/analizator/images/background_img.jpg")
-instructions_img = pygame.image.load("/analizator/images/instructions_img.jpg")
-icon_img = pygame.image.load("/analizator/images/icon.png")
+background_img = pygame.image.load(".images/background_img.jpg")
+instructions_img = pygame.image.load(".images/instructions_img.jpg")
+icon_img = pygame.image.load(".images/icon.png")
 pygame.display.set_icon(icon_img)
 
 
@@ -387,6 +387,87 @@ class Block:
         manage_events(self, next_block, playing_field, player)
         update_graphics(self, next_block, playing_field, player)
 
+    def rotate_i_block(self, playing_field):  # done
+        temp_rotated_i = Block("i_block", self.color)
+        temp_rotated_i.tiles = self.tiles.copy()
+
+        if self.direction == directions[0] or self.direction == directions[1]:
+
+            temp_rotated_i.tiles[0] = Tile(temp_rotated_i.tiles[1].x, temp_rotated_i.tiles[0].y, temp_rotated_i.color)
+            temp_rotated_i.tiles[1] = Tile(temp_rotated_i.tiles[0].x - tile_length, temp_rotated_i.tiles[0].y,
+                                           temp_rotated_i.color)
+            temp_rotated_i.tiles[2] = Tile(temp_rotated_i.tiles[0].x + tile_length, temp_rotated_i.tiles[0].y,
+                                           temp_rotated_i.color)
+            temp_rotated_i.tiles[3] = Tile(temp_rotated_i.tiles[2].x + tile_length, temp_rotated_i.tiles[0].y,
+                                           temp_rotated_i.color)
+            temp_rotated_i.direction = directions[2]  # "horizontal_1"
+        elif self.direction == directions[2] or self.direction == directions[3]:
+
+            temp_rotated_i.tiles[1] = Tile(temp_rotated_i.tiles[0].x, temp_rotated_i.tiles[0].y - tile_length,
+                                           temp_rotated_i.color)
+            temp_rotated_i.tiles[2] = Tile(temp_rotated_i.tiles[1].x, temp_rotated_i.tiles[1].y - tile_length,
+                                           temp_rotated_i.color)
+            temp_rotated_i.tiles[3] = Tile(temp_rotated_i.tiles[2].x, temp_rotated_i.tiles[2].y - tile_length,
+                                           temp_rotated_i.color)
+            temp_rotated_i.direction = directions[0]  # "vertical_1"
+
+        for block_tile in temp_rotated_i.tiles:
+            if block_tile.x <= off_set_x or block_tile.x >= playing_field_width:
+                return
+            y = off_set_y
+            for i in range(20):
+                for tile in playing_field.tiles["row" + str(i + 1)][y]:
+                    if not tile.empty and block_tile.x == tile.x and block_tile.y == tile.y:
+                        return
+                y += tile_length
+
+        self.direction = temp_rotated_i.direction
+        self.tiles = temp_rotated_i.tiles
+
+    def rotate_l_block(self, playing_field):  # done
+        temp_rotated_l = Block("l_block", self.color)
+        temp_rotated_l.tiles = self.tiles.copy()
+
+        if self.direction == directions[0]:
+
+            temp_rotated_l.tiles[0] = Tile(temp_rotated_l.tiles[0].x, temp_rotated_l.tiles[0].y, temp_rotated_l.color)
+            temp_rotated_l.tiles[1] = Tile(temp_rotated_l.tiles[0].x, temp_rotated_l.tiles[0].y - tile_length,
+                                           temp_rotated_l.color)
+            temp_rotated_l.tiles[2] = Tile(temp_rotated_l.tiles[1].x, temp_rotated_l.tiles[1].y - tile_length,
+                                           temp_rotated_l.color)
+            temp_rotated_l.tiles[3] = Tile(temp_rotated_l.tiles[2].x + tile_length, temp_rotated_l.tiles[2].y,
+                                           temp_rotated_l.color)
+            temp_rotated_l.direction = directions[2]  # "horizontal_1"
+        elif self.direction == directions[2]:
+
+            temp_rotated_l.tiles[0] = Tile(temp_rotated_l.tiles[3].x, temp_rotated_l.tiles[0].y, temp_rotated_l.color)
+            temp_rotated_l.tiles[1] = Tile(temp_rotated_l.tiles[0].x, temp_rotated_l.tiles[0].y - tile_length,
+                                           temp_rotated_l.color)
+            temp_rotated_l.tiles[2] = Tile(temp_rotated_l.tiles[1].x - tile_length, temp_rotated_l.tiles[1].y,
+                                           temp_rotated_l.color)
+            temp_rotated_l.tiles[3] = Tile(temp_rotated_l.tiles[2].x - tile_length, temp_rotated_l.tiles[2].y,
+                                           temp_rotated_l.color)
+            temp_rotated_l.direction = directions[1]  # "vertical_2"
+        elif self.direction == directions[1]:
+
+            temp_rotated_l.tiles[0] = Tile(temp_rotated_l.tiles[3].x, temp_rotated_l.tiles[0].y, temp_rotated_l.color)
+            temp_rotated_l.tiles[1] = Tile(temp_rotated_l.tiles[0].x + tile_length, temp_rotated_l.tiles[0].y,
+                                           temp_rotated_l.color)
+            temp_rotated_l.tiles[2] = Tile(temp_rotated_l.tiles[1].x, temp_rotated_l.tiles[1].y - tile_length,
+                                           temp_rotated_l.color)
+            temp_rotated_l.tiles[3] = Tile(temp_rotated_l.tiles[2].x, temp_rotated_l.tiles[2].y - tile_length,
+                                           temp_rotated_l.color)
+            temp_rotated_l.direction = directions[3]  # "horizontal_2"
+        elif self.direction == directions[3]:
+
+            temp_rotated_l.tiles[0] = Tile(temp_rotated_l.tiles[1].x, temp_rotated_l.tiles[0].y, temp_rotated_l.color)
+            temp_rotated_l.tiles[1] = Tile(temp_rotated_l.tiles[0].x + tile_length, temp_rotated_l.tiles[0].y,
+                                           temp_rotated_l.color)
+            temp_rotated_l.tiles[2] = Tile(temp_rotated_l.tiles[0].x - tile_length, temp_rotated_l.tiles[1].y,
+                                           temp_rotated_l.color)
+            temp_rotated_l.tiles[3] = Tile(temp_rotated_l.tiles[2].x, temp_rotated_l.tiles[2].y - tile_length,
+                                           temp_rotated_l.color)
+            temp_rotated_l.direction = directions[0]   # "vertical_1"
 
 
 
