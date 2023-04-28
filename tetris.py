@@ -356,11 +356,11 @@ def instructions(player=None):
         rendered_text = font.render(instructions_label, 1, orange)
         DISPLAY_SCREEN.blit(rendered_text, (width / 2 - rendered_text.get_width() / 2, 100))
 
-        instructions1 = "   Move Right:right arrow >"
-        instructions2 = "   Move   Left:                     left    arrow <"
-        instructions3 = "   Rotate:                      up      arrow ^"
-        instructions4 = "   Soft  Drop:                      down   arrow"
-        instructions5 = "   Hard  Drop:                      space"
+        instructions1 = "   Move Right:         right arrow >"
+        instructions2 = "   Move   Left:        left arrow <"
+        instructions3 = "   Rotate:             up arrow ^"
+        instructions4 = "   Soft  Drop:         down arrow"
+        instructions5 = "   Hard  Drop:         space"
 
         font = pygame.font.SysFont("comicsansms", 20)
         rendered_text1 = font.render(instructions1, 1, orange)
