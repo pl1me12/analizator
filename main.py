@@ -549,7 +549,7 @@ class Block:
             temp_rotated_s.tiles[3] = Tile(temp_rotated_s.tiles[2].x, temp_rotated_s.tiles[2].y - tile_length,
                                            temp_rotated_s.color)
             temp_rotated_s.direction = directions[2]  # "horizontal_1"
-        elif self.direction == directions[2] or self.direction == directions[3]
+        elif self.direction == directions[2] or self.direction == directions[3]:
             temp_rotated_s.tiles[0] = Tile(temp_rotated_s.tiles[2].x, temp_rotated_s.tiles[0].y, temp_rotated_s.color)
             temp_rotated_s.tiles[1] = Tile(temp_rotated_s.tiles[0].x - tile_length, temp_rotated_s.tiles[0].y,
                                            temp_rotated_s.color)
