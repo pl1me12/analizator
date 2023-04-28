@@ -468,6 +468,238 @@ class Block:
             temp_rotated_l.tiles[3] = Tile(temp_rotated_l.tiles[2].x, temp_rotated_l.tiles[2].y - tile_length,
                                            temp_rotated_l.color)
             temp_rotated_l.direction = directions[0]   # "vertical_1"
+            for block_tile in temp_rotated_l.tiles:
+                if block_tile.x <= off_set_x or block_tile.x >= playing_field_width:
+                    return
+                y = off_set_y
+                for i in range(20):
+                    for tile in playing_field.tiles["row" + str(i + 1)][y]:
+                        if not tile.empty and block_tile.x == tile.x and block_tile.y == tile.y:
+                            return
+                    y += tile_length
+
+            self.direction = temp_rotated_l.direction
+            self.tiles = temp_rotated_l.tiles
+
+    def rotate_j_block(self, playing_field):  # done
+        temp_rotated_j = Block("j_block", self.color)
+        temp_rotated_j.tiles = self.tiles.copy()
+
+        if self.direction == directions[0]:
+            temp_rotated_j.tiles[0] = Tile(temp_rotated_j.tiles[1].x, temp_rotated_j.tiles[0].y, temp_rotated_j.color)
+            temp_rotated_j.tiles[1] = Tile(temp_rotated_j.tiles[0].x - tile_length, temp_rotated_j.tiles[0].y,
+                                           temp_rotated_j.color)
+            temp_rotated_j.tiles[2] = Tile(temp_rotated_j.tiles[1].x, temp_rotated_j.tiles[1].y - tile_length,
+                                           temp_rotated_j.color)
+            temp_rotated_j.tiles[3] = Tile(temp_rotated_j.tiles[2].x, temp_rotated_j.tiles[2].y - tile_length,
+                                           temp_rotated_j.color)
+            temp_rotated_j.direction = directions[2]  # "horizontal_1"
+        elif self.direction == directions[2]:
+            temp_rotated_j.tiles[0] = Tile(temp_rotated_j.tiles[1].x - tile_length, temp_rotated_j.tiles[0].y,
+                                           temp_rotated_j.color)
+            temp_rotated_j.tiles[1] = Tile(temp_rotated_j.tiles[0].x, temp_rotated_j.tiles[0].y - tile_length,
+                                           temp_rotated_j.color)
+            temp_rotated_j.tiles[2] = Tile(temp_rotated_j.tiles[1].x + tile_length, temp_rotated_j.tiles[1].y,
+                                           temp_rotated_j.color)
+            temp_rotated_j.tiles[3] = Tile(temp_rotated_j.tiles[2].x + tile_length, temp_rotated_j.tiles[2].y,
+                                           temp_rotated_j.color)
+            temp_rotated_j.direction = directions[1]  # "vertical_2"
+        elif self.direction == directions[1]:
+            temp_rotated_j.tiles[0] = Tile(temp_rotated_j.tiles[2].x, temp_rotated_j.tiles[0].y, temp_rotated_j.color)
+            temp_rotated_j.tiles[1] = Tile(temp_rotated_j.tiles[0].x, temp_rotated_j.tiles[0].y - tile_length,
+                                           temp_rotated_j.color)
+            temp_rotated_j.tiles[2] = Tile(temp_rotated_j.tiles[1].x, temp_rotated_j.tiles[1].y - tile_length,
+                                           temp_rotated_j.color)
+            temp_rotated_j.tiles[3] = Tile(temp_rotated_j.tiles[2].x - tile_length, temp_rotated_j.tiles[2].y,
+                                           temp_rotated_j.color)
+            temp_rotated_j.direction = directions[3]  # "horizontal_2"
+        elif self.direction == directions[3]:  # back to normal:
+            temp_rotated_j.tiles[0] = Tile(temp_rotated_j.tiles[0].x, temp_rotated_j.tiles[0].y, temp_rotated_j.color)
+            temp_rotated_j.tiles[1] = Tile(temp_rotated_j.tiles[0].x + tile_length, temp_rotated_j.tiles[0].y,
+                                           temp_rotated_j.color)
+            temp_rotated_j.tiles[2] = Tile(temp_rotated_j.tiles[0].x - tile_length, temp_rotated_j.tiles[0].y,
+                                           temp_rotated_j.color)
+            temp_rotated_j.tiles[3] = Tile(temp_rotated_j.tiles[1].x, temp_rotated_j.tiles[1].y - tile_length,
+                                           temp_rotated_j.color)
+            temp_rotated_j.direction = directions[0]  # "vertical_1"
+
+        for block_tile in temp_rotated_j.tiles:
+            if block_tile.x <= off_set_x or block_tile.x >= playing_field_width:
+                return
+            y = off_set_y
+            for i in range(20):
+                for tile in playing_field.tiles["row" + str(i + 1)][y]:
+                    if not tile.empty and block_tile.x == tile.x and block_tile.y == tile.y:
+                        return
+                y += tile_length
+
+        self.direction = temp_rotated_j.direction
+        self.tiles = temp_rotated_j.tiles
+
+    def rotate_s_block(self, playing_field):  # done
+        temp_rotated_s = Block("s_block", self.color)
+        temp_rotated_s.tiles = self.tiles.copy()
+
+        if self.direction == directions[0] or self.direction == directions[1]:
+            temp_rotated_s.tiles[0] = Tile(temp_rotated_s.tiles[3].x, temp_rotated_s.tiles[0].y, temp_rotated_s.color)
+            temp_rotated_s.tiles[1] = Tile(temp_rotated_s.tiles[0].x, temp_rotated_s.tiles[0].y - tile_length,
+                                           temp_rotated_s.color)
+            temp_rotated_s.tiles[2] = Tile(temp_rotated_s.tiles[1].x - tile_length, temp_rotated_s.tiles[1].y,
+                                           temp_rotated_s.color)
+            temp_rotated_s.tiles[3] = Tile(temp_rotated_s.tiles[2].x, temp_rotated_s.tiles[2].y - tile_length,
+                                           temp_rotated_s.color)
+            temp_rotated_s.direction = directions[2]  # "horizontal_1"
+        elif self.direction == directions[2] or self.direction == directions[3]
+            temp_rotated_s.tiles[0] = Tile(temp_rotated_s.tiles[2].x, temp_rotated_s.tiles[0].y, temp_rotated_s.color)
+            temp_rotated_s.tiles[1] = Tile(temp_rotated_s.tiles[0].x - tile_length, temp_rotated_s.tiles[0].y,
+                                           temp_rotated_s.color)
+            temp_rotated_s.tiles[2] = Tile(temp_rotated_s.tiles[0].x, temp_rotated_s.tiles[0].y - tile_length,
+                                           temp_rotated_s.color)
+            temp_rotated_s.tiles[3] = Tile(temp_rotated_s.tiles[2].x + tile_length, temp_rotated_s.tiles[2].y,
+                                           temp_rotated_s.color)
+            temp_rotated_s.direction = directions[0]  # "vertical_1"
+
+        for block_tile in temp_rotated_s.tiles:
+            if block_tile.x <= off_set_x or block_tile.x >= playing_field_width:
+                return
+            y = off_set_y
+            for i in range(20):
+                for tile in playing_field.tiles["row" + str(i + 1)][y]:
+                    if not tile.empty and block_tile.x == tile.x and block_tile.y == tile.y:
+                        return
+                y += tile_length
+
+        self.direction = temp_rotated_s.direction
+        self.tiles = temp_rotated_s.tiles
+
+    def rotate_t_block(self, playing_field):  # done
+        temp_rotated_t = Block("j_block", self.color)
+        temp_rotated_t.tiles = self.tiles.copy()
+
+        if self.direction == directions[0]:
+            temp_rotated_t.tiles[0] = Tile(temp_rotated_t.tiles[0].x, temp_rotated_t.tiles[0].y, temp_rotated_t.color)
+            temp_rotated_t.tiles[1] = Tile(temp_rotated_t.tiles[0].x, temp_rotated_t.tiles[0].y - tile_length,
+                                           temp_rotated_t.color)
+            temp_rotated_t.tiles[2] = Tile(temp_rotated_t.tiles[1].x, temp_rotated_t.tiles[1].y - tile_length,
+                                           temp_rotated_t.color)
+            temp_rotated_t.tiles[3] = Tile(temp_rotated_t.tiles[1].x + tile_length, temp_rotated_t.tiles[1].y,
+                                           temp_rotated_t.color)
+            temp_rotated_t.direction = directions[2]  # "horizontal_1"
+        elif self.direction == directions[2]:
+            temp_rotated_t.tiles[0] = Tile(temp_rotated_t.tiles[0].x, temp_rotated_t.tiles[0].y, temp_rotated_t.color)
+            temp_rotated_t.tiles[1] = Tile(temp_rotated_t.tiles[0].x, temp_rotated_t.tiles[0].y - tile_length,
+                                           temp_rotated_t.color)
+            temp_rotated_t.tiles[2] = Tile(temp_rotated_t.tiles[1].x - tile_length, temp_rotated_t.tiles[1].y,
+                                           temp_rotated_t.color)
+            temp_rotated_t.tiles[3] = Tile(temp_rotated_t.tiles[1].x + tile_length, temp_rotated_t.tiles[2].y,
+                                           temp_rotated_t.color)
+            temp_rotated_t.direction = directions[1]  # "vertical_2"
+        elif self.direction == directions[1]:
+            temp_rotated_t.tiles[0] = Tile(temp_rotated_t.tiles[0].x, temp_rotated_t.tiles[0].y, temp_rotated_t.color)
+            temp_rotated_t.tiles[1] = Tile(temp_rotated_t.tiles[0].x, temp_rotated_t.tiles[0].y - tile_length,
+                                           temp_rotated_t.color)
+            temp_rotated_t.tiles[2] = Tile(temp_rotated_t.tiles[1].x, temp_rotated_t.tiles[1].y - tile_length,
+                                           temp_rotated_t.color)
+            temp_rotated_t.tiles[3] = Tile(temp_rotated_t.tiles[1].x - tile_length, temp_rotated_t.tiles[1].y,
+                                           temp_rotated_t.color)
+            temp_rotated_t.direction = directions[3]  # "horizontal_2"
+        elif self.direction == directions[3]:  # back to normal:
+            temp_rotated_t.tiles[0] = Tile(temp_rotated_t.tiles[0].x, temp_rotated_t.tiles[0].y, temp_rotated_t.color)
+            temp_rotated_t.tiles[1] = Tile(temp_rotated_t.tiles[0].x + tile_length, temp_rotated_t.tiles[0].y,
+                                           temp_rotated_t.color)
+            temp_rotated_t.tiles[2] = Tile(temp_rotated_t.tiles[0].x - tile_length, temp_rotated_t.tiles[0].y,
+                                           temp_rotated_t.color)
+            temp_rotated_t.tiles[3] = Tile(temp_rotated_t.tiles[0].x, temp_rotated_t.tiles[0].y - tile_length,
+                                           temp_rotated_t.color)
+            temp_rotated_t.direction = directions[0]  # "vertical_1"
+
+        for block_tile in temp_rotated_t.tiles:
+            if block_tile.x <= off_set_x or block_tile.x >= playing_field_width:
+                return
+            y = off_set_y
+            for i in range(20):
+                for tile in playing_field.tiles["row" + str(i + 1)][y]:
+                    if not tile.empty and block_tile.x == tile.x and block_tile.y == tile.y:
+                        return
+                y += tile_length
+
+        self.direction = temp_rotated_t.direction
+        self.tiles = temp_rotated_t.tiles
+
+    def rotate_z_block(self, playing_field):  # done
+        temp_rotated_z = Block("z_block", self.color)
+        temp_rotated_z.tiles = self.tiles.copy()
+
+        if self.direction == directions[0] or self.direction == directions[1]:
+
+            temp_rotated_z.tiles[0] = Tile(temp_rotated_z.tiles[3].x, temp_rotated_z.tiles[0].y, temp_rotated_z.color)
+            temp_rotated_z.tiles[1] = Tile(temp_rotated_z.tiles[0].x, temp_rotated_z.tiles[0].y - tile_length,
+                                           temp_rotated_z.color)
+            temp_rotated_z.tiles[2] = Tile(temp_rotated_z.tiles[1].x + tile_length, temp_rotated_z.tiles[1].y,
+                                           temp_rotated_z.color)
+            temp_rotated_z.tiles[3] = Tile(temp_rotated_z.tiles[2].x, temp_rotated_z.tiles[2].y - tile_length,
+                                           temp_rotated_z.color)
+            temp_rotated_z.direction = directions[2]  # "horizontal_1"
+        elif self.direction == directions[2] or self.direction == directions[3]:
+            temp_rotated_z.tiles[0] = Tile(temp_rotated_z.tiles[3].x, temp_rotated_z.tiles[0].y, temp_rotated_z.color)
+            temp_rotated_z.tiles[1] = Tile(temp_rotated_z.tiles[0].x + tile_length, temp_rotated_z.tiles[0].y,
+                                           temp_rotated_z.color)
+            temp_rotated_z.tiles[2] = Tile(temp_rotated_z.tiles[0].x, temp_rotated_z.tiles[0].y - tile_length,
+                                           temp_rotated_z.color)
+            temp_rotated_z.tiles[3] = Tile(temp_rotated_z.tiles[2].x - tile_length, temp_rotated_z.tiles[2].y,
+                                           temp_rotated_z.color)
+            temp_rotated_z.direction = directions[0]  # "vertical_1"
+
+        for block_tile in temp_rotated_z.tiles:
+            if block_tile.x <= off_set_x or block_tile.x >= playing_field_width:
+                return
+            y = off_set_y
+            for i in range(20):
+                for tile in playing_field.tiles["row" + str(i + 1)][y]:
+                    if not tile.empty and block_tile.x == tile.x and block_tile.y == tile.y:
+                        return
+                y += tile_length
+
+        self.direction = temp_rotated_z.direction
+        self.tiles = temp_rotated_z.tiles
+
+    def fall_completely(self, next_block, playing_field, player):
+        from tetris import update_graphics
+
+        fall = True
+        while fall:
+            for block_tile in self.tiles:
+                if block_tile.y >= playing_field_height + off_set_y - tile_length:
+                    fall = False
+                    break
+
+                    # check already existed tiles
+            for block_tile in self.tiles:
+                y = off_set_y
+                for i in range(20):
+                    for tile in playing_field.tiles["row" + str(i + 1)][y]:
+                        if not tile.empty and block_tile.y + tile_length == tile.y and block_tile.x == tile.x:
+                            fall = False
+                            break
+                    y += tile_length
+
+            if not fall:
+                break
+
+            for tile in self.tiles:
+                tile.y += tile_length
+
+            update_graphics(self, next_block, playing_field, player)
+            clock.get_rawtime()
+            clock.tick(50)
+
+
+class Player:
+    def __init__(self, start_time):
+        self.start_time = start_time
+
+        self.time_since_start = 0
+        self.score = 0
 
 
 
