@@ -210,7 +210,7 @@ class Block:
 
         self.direction = directions[0]  # vertical_1
 
-        #                         tile1                                                        , tile2            , tile3            , tile4
+        # tile1, tile2, tile3, tile4
         self.tiles = [Tile(off_set_x + playing_field_width / 2 - tile_length, off_set_y, self.color), Tile(0, 0, color),
                       Tile(0, 0, color), Tile(0, 0, color)]
 
